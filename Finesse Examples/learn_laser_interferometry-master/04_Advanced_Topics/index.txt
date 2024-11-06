@@ -1,0 +1,9 @@
+
+%%%%TOC_REPLACE%%%%
+
+<hr />
+
+<p>
+This chapter collects examples on advanced techniques. The main aim is
+to provide a reference for modelling such tasks with Finesse and Pykat.
+</p>
