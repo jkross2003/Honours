@@ -1,0 +1,3 @@
+[submodule "nemoastro"]
+	path = nemoastro
+	url = git@github.com:OZGrav/nemoastro.git
