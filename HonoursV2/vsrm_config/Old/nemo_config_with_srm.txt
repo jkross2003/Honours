@@ -1,0 +1,102 @@
+# NEMO Base Model (simplified from OzHF_ITMloss_4km.kat and converted to Finesse 3)
+###########################################################################
+###   Variables
+###########################################################################
+var Larm 4000
+var Mtm  74.1 # from NEMO paper (94.4 in OzHF_ITMloss_4km.kat)
+var itmT 0.01397
+var lmichx 4.5
+var lmichy 4.45
+
+###########################################################################
+###   Input optics
+###########################################################################
+l L0 500
+
+s l_in L0.p1 prm.p1
+# Power recycling mirror
+m prm T=0.03 L=2e-05 phi=90
+s prc prm.p2 bs.p1 L=53
+
+# Central beamsplitter
+bs bs R=0.4999625 T=0.4999625 alpha=45
+
+# CHECK Input laser power
+# pd P_in L0.p1.o
+# CHECK Laser power incident on BS
+# pd P_BS bs.p1.i
+# CHECK PRC Power
+# pd P_PRC bs.p1.o
+
+###########################################################################
+###   X arm
+###########################################################################
+s lx bs.p3 itmxar.p1 L=lmichx
+
+m itmxar T=1-265.0e-06 L=265.0e-06 phi=180 # phi from SRC_tunability_DCreadout_changedBW_fin3exp.ipynb (0.0 in OzHF_ITMloss_4km.kat)
+s ar_thick itmxar.p2 itmx.p1 L=0
+m itmx T=itmT L=20u phi=180
+s LX itmx.p2 etmx.p1 L=Larm
+
+m etmx T=5u L=20u phi=179.99999
+
+pendulum itmx_sus itmx.mech mass=Mtm fz=1 Qz=1M
+pendulum etmx_sus etmx.mech mass=Mtm fz=1 Qz=1M
+
+# CHECK X-arm cavity power
+# pd P_armX etmx.p1.i
+
+###########################################################################
+###   Y arm
+###########################################################################
+s ly bs.p2 itmyar.p1 L=lmichy
+
+m itmyar T=1-265.0e-06 L=265.0e-06 phi=90 # phi from SRC_tunability_DCreadout_changedBW_fin3exp.ipynb (0.0 in OzHF_ITMloss_4km.kat)
+s ar_thicky itmyar.p2 itmy.p1 L=0
+m itmy T=itmT L=20u phi=90
+s LY itmy.p2 etmy.p1 L=Larm
+
+m etmy T=5u L=20u phi=90.00001
+
+pendulum itmy_sus itmy.mech mass=Mtm fz=1 Qz=1M
+pendulum etmy_sus etmy.mech mass=Mtm fz=1 Qz=1M
+
+# CHECK Y-arm cavity power
+# pd P_armY etmy.p1.i
+
+###########################################################################
+###   SRM
+###########################################################################
+s src bs.p4 srm.p1 L=354
+m srm R=0.9515741379310345 T=0.04827586206896554 phi=-90.02274126019697
+
+# CHECK SRC power
+# pd P_SRC srm.p1.i
+
+###########################################################################
+###   Output & squeezing (from SRC_tunability_DCreadout_changedBW_fin3exp.ipynb)
+###########################################################################
+dbs OFI 
+link(srm.p2, OFI.p1)
+readout_dc AS OFI.p3.o
+
+# A squeezed source could be injected into the dark port
+# sq sqz db=-10 angle=90
+# link(sqz, OFI.p2)
+
+# ------------------------------------------------------------------------------
+# Degrees of Freedom
+# ------------------------------------------------------------------------------
+dof STRAIN LX.dofs.h +1  LY.dofs.h -1
+
+# signal generator
+sgen sig STRAIN
+
+qnoised NSR_with_RP AS.p1.i nsr=True
+qshot NSR_without_RP AS.p1.i nsr=True
+pd1 signal AS.p1.i f=fsig
+ad trans srm.p2.o f=fsig
+
+fsig(1)
+xaxis(fsig, log, 100, 10k, 200)
+    
