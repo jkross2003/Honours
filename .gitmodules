@@ -1,3 +1,6 @@
 [submodule "nemoastro"]
 	path = nemoastro
 	url = git@github.com:OZGrav/nemoastro.git
+[submodule "HonoursV2/nemoastro"]
+	path = HonoursV2/nemoastro
+	url = git@github.com:OZGrav/nemoastro.git
